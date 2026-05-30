@@ -21,7 +21,7 @@ _A Butter-Smooth Modular Company Ops Assistant — by Adam Clark (2026)_
 
 2. In Terminal:
     ```sh
-    python3 wicket_company.py
+    python3 wicket-company.py
     ```
 
 3. Select a menu option or type `hireme`/`recruitme/67890` for a secret message!
