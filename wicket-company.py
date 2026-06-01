@@ -1,11 +1,12 @@
 """
-Wicket-Company v3.2 — Modular, Persistent, Proactive CLI Toolbox (2026)
-Adam Clark
+Wicket-Company v3.3 — Persistent Modular CLI & API Toolbox
+Adam Clark (2026)
 
-- Modular business/ops/automation skills
-- Persistent memory in JSON file
-- Ready for API, cloud, and scale-up (Flask integration, user auth, and more easily added)
-- Features: website/SEO, entries, marketing, notes, analytics, file reference, AI copilot, log/history, recruiter "hire me" easter egg
+Features:
+- Modular skills: Website/SEO, data entry, marketing, notes, analytics, AI copilot, file links, logs, user roles
+- Persistent memory (JSON; supports upgrades to SQL/DB)
+- Proactive onboarding, analytics/statistics
+- LLM fallback, recruiter Easter egg, undo, error handling, ready for cloud API wrap
 """
 
 import os
@@ -37,7 +38,7 @@ def load_data():
             with open(DATA_FILE, "r") as f:
                 data = json.load(f)
             for k in ("website", "entries", "marketing", "notes", "users", "log", "files", "calendar"):
-                data.setdefault(k, [] if k not in ("website",) else {})
+                data.setdefault(k, [] if k != "website" else {})
             data.setdefault("launches", 0)
             return data
     except Exception:
@@ -51,14 +52,14 @@ def save_data(data):
     except Exception:
         butter_print("Could not save session memory!", "error")
 
-have_openai = True
 try:
     import openai
+    have_openai = True
 except ImportError:
     have_openai = False
 
 def main_menu(username, role):
-    print(f"\nWicket-Company v3.2 — User: {username} (role: {role})")
+    print(f"\nWicket-Company v3.3 — User: {username} (role: {role})")
     print("-----------------------------------------------------")
     print("1) Website content & SEO  2) Data Entry / Reporting")
     print("3) Marketing Support      4) Notes")
@@ -129,7 +130,7 @@ def show_analytics(data):
     print("Total notes:", len(data.get('notes', [])))
     print("Total files:", len(data.get('files', [])))
     print("Session time:", datetime.now().strftime("%Y-%m-%d %H:%M"))
-    butter_print("👀 Looking for a dev to build and maintain tools like this? Contact Adam Clark — savagetism@icloud.com — github.com/savageAZfck\n","info")
+    butter_print("👀 Looking for a dev who can build and maintain tools like this? Contact Adam Clark — savagetism@icloud.com — github.com/savageAZfck\n","info")
     exp = butter_input("Export entries as CSV?", "n").lower()
     if exp == "y":
         import csv
@@ -143,7 +144,7 @@ def show_analytics(data):
         except Exception:
             butter_print("Could not export CSV.","error")
 
-def ai_copilot():
+def ai_copilot(messages=None):
     butter_print("-- AI Copilot (Demo Only) --", "action")
     try:
         import openai
@@ -152,23 +153,29 @@ def ai_copilot():
             butter_print("Set your OpenAI API key in the environment for AI features.", "error")
             return
         openai.api_key = key
-        prompt = butter_input("What would you like AI to help with? (seo, content, code)")
+        if not messages:
+            prompt = butter_input("What would you like AI to help with? (seo, content, code)")
+            messages = [
+                {"role": "system", "content": "You are Wicket-Company’s AI teammate: short, helpful, creative."},
+                {"role": "user", "content": prompt}
+            ]
         print("🤖 Thinking...", end="", flush=True)
         time.sleep(1.2)
         print("\r", end="")
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
-            messages=[
-                {"role":"system", "content":"You are Wicket-Company’s AI teammate: short, helpful, and creative."},
-                {"role":"user", "content":prompt}
-            ],
+            messages=messages,
             max_tokens=120,
         )
-        butter_print(response["choices"][0]["message"]["content"].strip(),"info")
+        ans = response["choices"][0]["message"]["content"].strip()
+        butter_print(ans,"info")
+        return ans
     except ImportError:
         butter_print("AI copilot requires `pip install openai`.","error")
+        return "(AI unavailable: OpenAI not installed)"
     except Exception as e:
         butter_print(f"AI error: {e}","error")
+        return f"(AI unavailable: {e})"
 
 def file_attachment(data, log):
     butter_print("-- File Attachments --", "action")
@@ -248,7 +255,7 @@ def main():
     undo_stack = {"entries": [], "marketing": [], "notes": []}
     username, role = user_login(data)
     log = data.setdefault("log", [])
-    print("Welcome to Wicket-Company v3.2 (Butter-Smooth, Hireable, Company-Grade) — type 'exit' to bolt!")
+    print("Welcome to Wicket-Company v3.3 (Butter-Smooth, Hireable, Company-Grade) — type 'exit' to bolt!")
     print("Type 'help' for a spot of guidance, any time.\n")
     print("Your Wicket-Company welcome:\n" + proactive_summary(data))
 
