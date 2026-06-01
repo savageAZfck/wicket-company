@@ -71,5 +71,77 @@ It’s a “production-grade” project ready for demos, internal tools, startup
 ---
 
 ## ✨ Example CLI Usage
+Welcome to Wicket-Company v4.0 (Butter-Smooth, Hireable, Company-Grade) — type 'exit' to bolt!
+Type 'help' for a spot of guidance, any time.
+
+Your Wicket-Company welcome:
+No calendar events.
+Atmosphere: Breezy, 66°F
+No to-dos left.
+Last note: No notes yet.
+Opening jest: Debugging: where you painfully prove your own logic, one print at a time.
+
+You: 1
+➡️ -- Website/SEO Manager --
+Home page URL [ ] : https://modern-storage.com
+Main SEO keywords (comma-separated) [ ]: storage, automation, analytics
+Site description [ ] : Fast, persistent storage dashboards for modern ops.
+✔️ Website content updated.
+
+You: 2
+➡️ -- Reporting/Data Entry --
+Team [ops]: tech
+Entry category [task]: bugfix
+Describe the entry: Resolved syncing error for latest entries.
+✔️ Entry logged.
+ℹ️ Entries logged: 1
+
+You: 4
+➡️ -- Notes --
+Add a new note (or Enter to skip): Demo recruiter walkthrough for Wicket v4.0
+✔️ Note added.
+ℹ️ Recent notes:
+- [2026-06-01 16:30] Demo recruiter walkthrough for Wicket v4.0
+
+You: 5
+➡️ -- Toolbox Analytics --
+Website Home URL: https://modern-storage.com
+SEO Keywords: storage, automation, analytics
+Site Description: Fast, persistent storage dashboards for modern ops.
+Entries logged: 1
+Marketing campaigns: 0
+Total notes: 1
+Total files: 0
+Session time: 2026-06-01 16:32
+👀 Looking for a dev who can build and maintain tools like this? Contact Adam Clark — savagetism@icloud.com — github.com/savageAZfck
+
+Export entries as CSV? [n] y
+✔️ Entries exported to entries_export.csv.
+
+You: ai copilot
+➡️ -- AI Copilot (Demo Only) --
+What would you like AI to help with? (seo, content, code) Suggest social copy for our next campaign.
+🤖 Thinking...
+ℹ️ "Ready for a modern data upgrade? Discover persistent, reliable storage with Wicket-Company."
+
+You: hireme
+
+🎩 You've discovered Wicket-Company's secret!
+If your business needs a modern workflow overhaul and a creative Python engineer,
+reach out: Adam Clark — savagetism@icloud.com — github.com/savageAZfck
+
+You: stats
+Wicket Analytics (tea served upon request):
+- Questions Asked: 1
+- To-dos Created: 0
+- Notes Taken: 1
+- Calendar Entries: 0
+- Jokes Enjoyed: 0
+- Total Interactions: 5
+
+You: exit
+Wicket Analytics (tea served upon request):
+(…recap printed…)
+Cheerio from Wicket-Company 🫖
 
 
