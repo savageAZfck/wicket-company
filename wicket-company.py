@@ -1,12 +1,14 @@
 """
-Wicket-Company v3.3 — Persistent Modular CLI & API Toolbox
+Wicket-Company v4.0 — Modular, API-Ready Company Platform
 Adam Clark (2026)
 
 Features:
-- Modular skills: Website/SEO, data entry, marketing, notes, analytics, AI copilot, file links, logs, user roles
-- Persistent memory (JSON; supports upgrades to SQL/DB)
-- Proactive onboarding, analytics/statistics
-- LLM fallback, recruiter Easter egg, undo, error handling, ready for cloud API wrap
+- CLI automation: Website/SEO, data entry, marketing, notes, analytics, attachments, logs, user roles
+- FastAPI endpoints for cloud microservice use
+- Persistent state: All data to JSON (DB/SQL-ready and testable)
+- Recruitment-ready: Easter eggs, analytics, playful onboarding
+- Advanced error handling, onboarding, and self-healing data
+- Modular code design, easy to extend with plug-in skills
 """
 
 import os
@@ -42,7 +44,7 @@ def load_data():
             data.setdefault("launches", 0)
             return data
     except Exception:
-        butter_print("[!] Data file missing or corrupted. Starting fresh...","error")
+        butter_print("[!] Data file missing or corrupted. Starting fresh...", "error")
     return {"website": {}, "entries": [], "marketing": [], "notes": [], "users": [], "log": [], "files": [], "calendar": [], "launches": 0}
 
 def save_data(data):
@@ -59,7 +61,7 @@ except ImportError:
     have_openai = False
 
 def main_menu(username, role):
-    print(f"\nWicket-Company v3.3 — User: {username} (role: {role})")
+    print(f"\nWicket-Company v4.0 — User: {username} (role: {role})")
     print("-----------------------------------------------------")
     print("1) Website content & SEO  2) Data Entry / Reporting")
     print("3) Marketing Support      4) Notes")
@@ -136,7 +138,7 @@ def show_analytics(data):
         import csv
         try:
             with open("entries_export.csv", "w", newline="") as f:
-                writer = csv.writer(f)
+                writer = csv.writer(f, quoting=csv.QUOTE_ALL)
                 writer.writerow(["time", "team", "category", "desc"])
                 for e in data["entries"]:
                     writer.writerow([e["time"], e["team"], e["category"], e["desc"]])
@@ -146,7 +148,36 @@ def show_analytics(data):
 
 def ai_copilot(messages=None):
     butter_print("-- AI Copilot (Demo Only) --", "action")
+    # Try OpenAI new and classic SDK imports
     try:
+        try:
+            from openai import OpenAI
+            client = OpenAI()
+            key = os.getenv("OPENAI_API_KEY")
+            if not key:
+                butter_print("Set your OpenAI API key in the environment for AI features.", "error")
+                return
+            if not messages:
+                prompt = butter_input("What would you like AI to help with? (seo, content, code)")
+                messages = [
+                    {"role": "system", "content": "You are Wicket-Company’s AI teammate: short, helpful, creative."},
+                    {"role": "user", "content": prompt}
+                ]
+            print("🤖 Thinking...", end="", flush=True)
+            time.sleep(1.2)
+            print("\r", end="")
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=messages,
+                max_tokens=120,
+                n=1
+            )
+            ans = response.choices[0].message.content.strip()
+            butter_print(ans, "info")
+            return ans
+        except ImportError:
+            pass
+        # Fallback to older openai package
         import openai
         key = os.getenv("OPENAI_API_KEY")
         if not key:
@@ -166,15 +197,13 @@ def ai_copilot(messages=None):
             model="gpt-3.5-turbo",
             messages=messages,
             max_tokens=120,
+            n=1
         )
         ans = response["choices"][0]["message"]["content"].strip()
-        butter_print(ans,"info")
+        butter_print(ans, "info")
         return ans
-    except ImportError:
-        butter_print("AI copilot requires `pip install openai`.","error")
-        return "(AI unavailable: OpenAI not installed)"
     except Exception as e:
-        butter_print(f"AI error: {e}","error")
+        butter_print(f"AI error: {e}", "error")
         return f"(AI unavailable: {e})"
 
 def file_attachment(data, log):
@@ -255,7 +284,7 @@ def main():
     undo_stack = {"entries": [], "marketing": [], "notes": []}
     username, role = user_login(data)
     log = data.setdefault("log", [])
-    print("Welcome to Wicket-Company v3.3 (Butter-Smooth, Hireable, Company-Grade) — type 'exit' to bolt!")
+    print("Welcome to Wicket-Company v4.0 (Butter-Smooth, Hireable, Company-Grade) — type 'exit' to bolt!")
     print("Type 'help' for a spot of guidance, any time.\n")
     print("Your Wicket-Company welcome:\n" + proactive_summary(data))
 
@@ -300,6 +329,42 @@ def main():
                     butter_print(f"Did you mean '{suggestion}'?", "info")
                 else:
                     butter_print("Invalid choice or command — type 'help' any time.", "error")
+
+# --- FastAPI Plugin to run this as an API microservice ---
+try:
+    from fastapi import FastAPI, HTTPException
+    from pydantic import BaseModel
+    from typing import List
+
+    app = FastAPI(
+        title="Wicket-Company API v4.0",
+        description="Modular Python ops toolbox, now as a web microservice.",
+        version="4.0.0"
+    )
+
+    class ChatMessage(BaseModel):
+        role: str
+        content: str
+
+    class ChatPayload(BaseModel):
+        messages: List[ChatMessage]
+
+    @app.get("/health")
+    async def health_check():
+        return {"status": "healthy"}
+
+    @app.post("/v1/chat")
+    async def chat_endpoint(payload: ChatPayload):
+        msgs = [m.model_dump() for m in payload.messages]
+        try:
+            response = ai_copilot(msgs)
+            if "(AI unavailable" in response:
+                raise HTTPException(status_code=502, detail=response)
+            return {"response": response}
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+except ImportError:
+    pass
 
 if __name__ == "__main__":
     main()
