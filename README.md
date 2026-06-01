@@ -1,147 +1,122 @@
-# 🎩 Wicket-Company v4.0
+# 🎩 Wicket-Company v6.0
 
-*A Butter-Smooth Modular Company CLI & API Platform*  
+*Enterprise Modular Automation, CLI & Cloud API Platform*  
 by Adam Clark (2026) | [GitHub](https://github.com/savageAZfck/wicket-company)
 
 ---
 
 ## 🚀 What is Wicket-Company?
 
-Wicket-Company is a persistent, modular automation platform for company operations and dev teams.  
-Run as a CLI, wire up to FastAPI for cloud microservices, enable AI Copilot, and enjoy analytics, onboarding, undo, recruiter Easter eggs, and more.  
-It’s a “production-grade” project ready for demos, internal tools, startup MVPs, and interviews.
+Wicket-Company is a persistent, plug-in business workflow platform and internal ops CLI, ready for real company use or SaaS deployment. Features include:
+
+- Modular plug-in “skills” (website/SEO, data entry, marketing, notes, AI copilot, analytics, logs, and more)
+- Persistent, production-safe SQL DB (with SQLite backend out of the box)
+- FastAPI web endpoints and API key security—for instant cloud microservice/automation use
+- Sarcastic, British-flavored AI copilot (auto-detects OpenAI version, always witty fallback)
+- Onboarding summaries, analytics dashboard, “hire me” Easter egg, automated error handling and logging
+- Testable, CI/CD ready, recoverable and resilient (self-healing memory, secure secrets/config)
 
 ---
 
-## 🧰 Features
+## 🛠️ Quick Start (CLI)
 
-- Modular Skills: website/SEO, data/reporting, marketing, notes, attachments, logging, analytics, onboarding, undo
-- Persistent Memory: Data always saved/reloaded (JSON, upgradeable to SQL)
-- AI Copilot: OpenAI GPT when available, safe fallback if not
-- Proactive: Personalized welcome, analytics, and recruiter-friendly Easter egg
-- Cloud/API Ready: FastAPI endpoints included out-of-the-box (`/health`, `/v1/chat`)
-- CSV Export: For reporting and compatibility with business tools
-- CI/CD Friendly: Drop-in GitHub Actions test workflow (pytest) ready for production ops
-
----
-
-## 🛠️ Quick Start
-
-1. **(Optional for AI Copilot):**  
+1. **Install dependencies:**
    ```sh
-   pip install openai
-   export OPENAI_API_KEY=sk-...
+   pip install sqlalchemy fastapi uvicorn pydantic
    ```
-2. **Run as CLI:**  
+   *(Optional for AI Copilot: `pip install openai`)*
+2. **Run in CLI mode:**
    ```sh
    python3 wicket_company.py
    ```
-3. **Try menu options (`1-9`), or type `hireme`, `recruitme`, or `67890` for a surprise!**
+3. **Log in and try the main menu.**
+   - `1` — Website/SEO manager
+   - `2` — Data entry/reporting
+   - `5` — Analytics & CSV export
+   - `6` — AI Copilot (`OPENAI_API_KEY` in your env for LLM; fallback is witty/sarcastic by default)
+   - Type `help` to see more, `hireme` for a recruiter surprise, or `exit` to safely quit
 
-4. **Run as API (needs `fastapi` and `uvicorn`):**  
+---
+
+## ☁️ Quick Start (Web API)
+
+1. **Run locally with:**
    ```sh
-   pip install fastapi uvicorn pydantic
    uvicorn wicket_company:app --reload
    ```
-   Test:  
+2. **Test endpoints:**
+   - `GET /health` — Health check
+   - `POST /entries` — Add entry (api_key required)
+   - `GET /entries` — List entries (api_key required)
+   - `POST /website` — Update website (api_key required)
+   - `POST /ai` — AI chat with payload, see in docs
+3. Add your API key as an env variable:  
    ```sh
-   curl http://127.0.0.1:8000/health
+   export WICKET_API_KEY=your-key-here
    ```
+   and use `X-API-KEY` in requests
 
 ---
 
-## 🧪 Testing & CI/CD
+## 🧪 Example PyTest Test
 
-- Place test files in `/tests` (see sample below).
-- Provided `.github/workflows/test.yml` workflow:  
-   - Auto-runs pytest on every push/Pull Request.
-- Example test:
-    ```python
-    # tests/test_core.py
-    from wicket_company import load_data, save_data
+Place this in `tests/test_core.py`:
 
-    def test_memory_round_trip():
-        data = load_data()
-        data["testval"] = 42
-        save_data(data)
-        loaded = load_data()
-        assert loaded["testval"] == 42
-    ```
+```python
+from wicket_company import get_session, add_entry, list_entries
 
----
+def test_db_add_and_query():
+    session = get_session()
+    assert add_entry(session, "test", "integration", "pytest entry")
+    results = list_entries(session, 5)
+    assert any(e.category == "integration" for e in results)
+    session.close()
 
-## ✨ Example CLI Usage
-Welcome to Wicket-Company v4.0 (Butter-Smooth, Hireable, Company-Grade) — type 'exit' to bolt!
-Type 'help' for a spot of guidance, any time.
+Welcome to Wicket-Company v6.0 — type 'exit' to quit!
+Type 'help' for guidance, any time.
 
-Your Wicket-Company welcome:
-No calendar events.
-Atmosphere: Breezy, 66°F
-No to-dos left.
-Last note: No notes yet.
-Opening jest: Debugging: where you painfully prove your own logic, one print at a time.
+-- Wicket-Company Dashboard --
+Website: none yet.
+Stats: Entries = 0
+Atmosphere: Rainy 75 °F
+Jest: Why was the computer cold? It forgot to close its Windows!
+Type 'help' for full feature list.
 
 You: 1
-➡️ -- Website/SEO Manager --
-Home page URL [ ] : https://modern-storage.com
-Main SEO keywords (comma-separated) [ ]: storage, automation, analytics
-Site description [ ] : Fast, persistent storage dashboards for modern ops.
-✔️ Website content updated.
+➡️ -- Website/SEO --
+Home page URL [] : https://acme-tech.com
+Main SEO keywords [] : automation, devtools, AI, onboarding
+Site description [] : Next-generation ops and analytics
+✔️ Content updated — your SEO just got 7% shinier.
 
 You: 2
-➡️ -- Reporting/Data Entry --
-Team [ops]: tech
-Entry category [task]: bugfix
-Describe the entry: Resolved syncing error for latest entries.
-✔️ Entry logged.
-ℹ️ Entries logged: 1
-
-You: 4
-➡️ -- Notes --
-Add a new note (or Enter to skip): Demo recruiter walkthrough for Wicket v4.0
-✔️ Note added.
-ℹ️ Recent notes:
-- [2026-06-01 16:30] Demo recruiter walkthrough for Wicket v4.0
+➡️ -- Data Entry --
+Team [ops]: engineering
+Category [task]: bugfix
+Description: Patched login timeout error for new user flow.
+✔️ Entry logged. (Total: 1)
 
 You: 5
-➡️ -- Toolbox Analytics --
-Website Home URL: https://modern-storage.com
-SEO Keywords: storage, automation, analytics
-Site Description: Fast, persistent storage dashboards for modern ops.
-Entries logged: 1
-Marketing campaigns: 0
-Total notes: 1
-Total files: 0
-Session time: 2026-06-01 16:32
-👀 Looking for a dev who can build and maintain tools like this? Contact Adam Clark — savagetism@icloud.com — github.com/savageAZfck
-
+➡️ -- Analytics --
+Website: https://acme-tech.com
+Entries: 1
 Export entries as CSV? [n] y
-✔️ Entries exported to entries_export.csv.
+✔️ Entries exported: entries_export.csv
+-- For hiring: Adam Clark | savagetism@icloud.com | github.com/savageAZfck --
 
-You: ai copilot
-➡️ -- AI Copilot (Demo Only) --
-What would you like AI to help with? (seo, content, code) Suggest social copy for our next campaign.
-🤖 Thinking...
-ℹ️ "Ready for a modern data upgrade? Discover persistent, reliable storage with Wicket-Company."
+You: 6
+➡️ -- AI Copilot --
+What would you like sarcastic AI to riff on? Reasons to embrace automated testing?
+🤖 Wicket AI: "Because betting your business on hope alone is so last decade. Automated tests: for when you want blame to land faster and with proof."
+
+You: notes
+Add note (or Enter to skip): Demo feedback—onboarding is super smooth!
+Note added. Did your future self say thanks?
 
 You: hireme
-
-🎩 You've discovered Wicket-Company's secret!
-If your business needs a modern workflow overhaul and a creative Python engineer,
-reach out: Adam Clark — savagetism@icloud.com — github.com/savageAZfck
-
-You: stats
-Wicket Analytics (tea served upon request):
-- Questions Asked: 1
-- To-dos Created: 0
-- Notes Taken: 1
-- Calendar Entries: 0
-- Jokes Enjoyed: 0
-- Total Interactions: 5
+🎩 You've found the engineer you're looking for.
+If you want to overhaul business ops, workflow, or automation with code that's modular, persistent, API/cloud-ready, and actually fun to use:  
+Hire me — Adam Clark | savagetism@icloud.com | github.com/savageAZfck
 
 You: exit
-Wicket Analytics (tea served upon request):
-(…recap printed…)
-Cheerio from Wicket-Company 🫖
-
-
+✔️ Goodbye!
