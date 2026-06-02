@@ -1,122 +1,89 @@
-# 🎩 Wicket-Company v6.0
+# 🎩 Wicket-Company v8.0
 
-*Enterprise Modular Automation, CLI & Cloud API Platform*  
-by Adam Clark (2026) | [GitHub](https://github.com/savageAZfck/wicket-company)
+*Enterprise Modular Automation Platform — Butter Smooth, Production-Proof*  
+by Adam Clark (2026) | [github.com/savageAZfck/wicket-company](https://github.com/savageAZfck/wicket-company)
 
 ---
 
 ## 🚀 What is Wicket-Company?
 
-Wicket-Company is a persistent, plug-in business workflow platform and internal ops CLI, ready for real company use or SaaS deployment. Features include:
+Wicket-Company v8.0 is a plug-in, SQL-backed, AI-powered automation/ops platform and CLI for modern teams.  
+Run as a resilient terminal dashboard or instantly launch it as a FastAPI web microservice for cloud and SaaS use.  
+Features onboard analytics, error-proof onboarding, logging, and a sarcastic, British-flavored AI Copilot with function calling abilities.
 
-- Modular plug-in “skills” (website/SEO, data entry, marketing, notes, AI copilot, analytics, logs, and more)
-- Persistent, production-safe SQL DB (with SQLite backend out of the box)
-- FastAPI web endpoints and API key security—for instant cloud microservice/automation use
-- Sarcastic, British-flavored AI copilot (auto-detects OpenAI version, always witty fallback)
-- Onboarding summaries, analytics dashboard, “hire me” Easter egg, automated error handling and logging
-- Testable, CI/CD ready, recoverable and resilient (self-healing memory, secure secrets/config)
+---
+
+## 🧰 Top Features
+
+- Modular plug-in skills (website/SEO, data entry/reporting, analytics, AI, logging)
+- Persistent, concurrent-safe database (SQLite/SQLAlchemy—easily swap for Postgres)
+- FastAPI-ready: microservice endpoints, API key security
+- Version-agnostic, British-witty AI Copilot (OpenAI, function calling, fallback included)
+- Self-healing state, robust logging/auditing, proactive onboarding and help
+- CI/CD and docker-compose integration—easy deploy for ops/devs
+- “Hire me” Easter egg for recruiters/hiring managers
 
 ---
 
 ## 🛠️ Quick Start (CLI)
 
-1. **Install dependencies:**
+1. **Install dependencies:**  
    ```sh
    pip install sqlalchemy fastapi uvicorn pydantic
    ```
    *(Optional for AI Copilot: `pip install openai`)*
-2. **Run in CLI mode:**
+
+2. **Run as CLI:**  
    ```sh
    python3 wicket_company.py
    ```
-3. **Log in and try the main menu.**
-   - `1` — Website/SEO manager
-   - `2` — Data entry/reporting
-   - `5` — Analytics & CSV export
-   - `6` — AI Copilot (`OPENAI_API_KEY` in your env for LLM; fallback is witty/sarcastic by default)
-   - Type `help` to see more, `hireme` for a recruiter surprise, or `exit` to safely quit
+3. **Type menu numbers to use features (`1` = website/SEO, `2` = data, `5` = analytics, `6` = AI).**
+   - `hireme` or `recruitme` for a secret recruiter message.
+   - `help` for all commands.
 
 ---
 
-## ☁️ Quick Start (Web API)
+## ☁️ Run as API
 
-1. **Run locally with:**
+1. **Launch FastAPI app:**  
    ```sh
    uvicorn wicket_company:app --reload
    ```
-2. **Test endpoints:**
-   - `GET /health` — Health check
-   - `POST /entries` — Add entry (api_key required)
-   - `GET /entries` — List entries (api_key required)
-   - `POST /website` — Update website (api_key required)
-   - `POST /ai` — AI chat with payload, see in docs
-3. Add your API key as an env variable:  
+2. **Test:**
    ```sh
-   export WICKET_API_KEY=your-key-here
+   curl http://localhost:8000/health
    ```
-   and use `X-API-KEY` in requests
+3. **Add your API key in `.env` or as env var** (`WICKET_API_KEY`)
+   - Use `X-API-KEY` header for POST requests
 
 ---
 
-## 🧪 Example PyTest Test
+## 🐳 Docker Support (Production/DevOps Ready)
 
-Place this in `tests/test_core.py`:
+1. **Add a `Dockerfile` and `docker-compose.yml`** as per the included templates.
+2. **Start up with:**  
+   ```sh
+   docker-compose up --build
+   ```
+   The API will be available at http://localhost:8000
+
+---
+
+## 🧪 Automated Testing
+
+- Place tests in `/tests`
+- Example PyTest:
 
 ```python
-from wicket_company import get_session, add_entry, list_entries
+# tests/test_core.py
+from wicket_company import SessionLocal, Entry, now
 
-def test_db_add_and_query():
-    session = get_session()
-    assert add_entry(session, "test", "integration", "pytest entry")
-    results = list_entries(session, 5)
-    assert any(e.category == "integration" for e in results)
+def test_add_entry_and_list():
+    session = SessionLocal()
+    entry = Entry(team="qa", category="test", desc="pytest check", time=now())
+    session.add(entry)
+    session.commit()
+    rows = session.query(Entry).all()
     session.close()
+    assert any(e.desc == "pytest check" for e in rows)
 
-Welcome to Wicket-Company v6.0 — type 'exit' to quit!
-Type 'help' for guidance, any time.
-
--- Wicket-Company Dashboard --
-Website: none yet.
-Stats: Entries = 0
-Atmosphere: Rainy 75 °F
-Jest: Why was the computer cold? It forgot to close its Windows!
-Type 'help' for full feature list.
-
-You: 1
-➡️ -- Website/SEO --
-Home page URL [] : https://acme-tech.com
-Main SEO keywords [] : automation, devtools, AI, onboarding
-Site description [] : Next-generation ops and analytics
-✔️ Content updated — your SEO just got 7% shinier.
-
-You: 2
-➡️ -- Data Entry --
-Team [ops]: engineering
-Category [task]: bugfix
-Description: Patched login timeout error for new user flow.
-✔️ Entry logged. (Total: 1)
-
-You: 5
-➡️ -- Analytics --
-Website: https://acme-tech.com
-Entries: 1
-Export entries as CSV? [n] y
-✔️ Entries exported: entries_export.csv
--- For hiring: Adam Clark | savagetism@icloud.com | github.com/savageAZfck --
-
-You: 6
-➡️ -- AI Copilot --
-What would you like sarcastic AI to riff on? Reasons to embrace automated testing?
-🤖 Wicket AI: "Because betting your business on hope alone is so last decade. Automated tests: for when you want blame to land faster and with proof."
-
-You: notes
-Add note (or Enter to skip): Demo feedback—onboarding is super smooth!
-Note added. Did your future self say thanks?
-
-You: hireme
-🎩 You've found the engineer you're looking for.
-If you want to overhaul business ops, workflow, or automation with code that's modular, persistent, API/cloud-ready, and actually fun to use:  
-Hire me — Adam Clark | savagetism@icloud.com | github.com/savageAZfck
-
-You: exit
-✔️ Goodbye!
